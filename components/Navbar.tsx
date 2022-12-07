@@ -13,14 +13,14 @@ import { createOrGetUser } from "../utils";
 import Logo from "../utils/tiktik-logo.png";
 
 const Navbar = () => {
-  // const [user, setUser] = useState<IUser | null>();
+  const [user, setUser] = useState<IUser | null>();
   const [searchValue, setSearchValue] = useState("");
   const router = useRouter();
   const { userProfile, addUser, removeUser } = useAuthStore();
 
-  // useEffect(() => {
-  //   setUser(userProfile);
-  // }, [userProfile]);
+  useEffect(() => {
+    setUser(userProfile);
+  }, [userProfile]);
 
   const handleSearch = (e: { preventDefault: () => void }) => {
     e.preventDefault();
@@ -29,6 +29,7 @@ const Navbar = () => {
       router.push(`/search/${searchValue}`);
     }
   };
+
   return (
     <div className="w-full flex justify-between items-center border-b-2 border-gray-200 py-2 px-4">
       <Link href="/">
@@ -41,6 +42,7 @@ const Navbar = () => {
           />
         </div>
       </Link>
+
       <div className="relative hidden md:block">
         <form
           onSubmit={handleSearch}
@@ -61,32 +63,30 @@ const Navbar = () => {
         </form>
       </div>
       <div>
-        {userProfile ? (
+        {user ? (
           <div className="flex gap-5 md:gap-10">
             <Link href="/upload">
               <button className="border-2 px-2 md:px-4 text-md font-semibold flex items-center gap-2 p-2">
-                <IoMdAdd className="text-xl" /> {` `}
-                <span className="hidden md:block">Upload</span>
+                <IoMdAdd className="text-xl" />{" "}
+                <span className="hidden md:block">Upload </span>
               </button>
             </Link>
-
-            {userProfile?.image && (
-              <Link href="">
-                <>
+            {user.image && (
+              <Link href={`/profile/${user._id}`}>
+                <div>
                   <Image
+                    className="rounded-full cursor-pointer"
+                    src={user.image}
+                    alt="user"
                     width={40}
                     height={40}
-                    className=" rounded-full cursor-pointer"
-                    src={userProfile.image}
-                    alt="profile photo"
-                    // layout="responsive"
                   />
-                </>
+                </div>
               </Link>
             )}
             <button
               type="button"
-              className="px-2"
+              className=" border-2 p-2 rounded-full cursor-pointer outline-none shadow-md"
               onClick={() => {
                 googleLogout();
                 removeUser();
@@ -98,7 +98,7 @@ const Navbar = () => {
         ) : (
           <GoogleLogin
             onSuccess={(response) => createOrGetUser(response, addUser)}
-            onError={() => console.log("Error")}
+            onError={() => console.log("Login Failed")}
           />
         )}
       </div>
